@@ -216,6 +216,53 @@ class Stepper:
         GPIO.output(self.config['c3'],GPIO.LOW)
         GPIO.output(self.config['c4'],GPIO.LOW)
         
+class PolarStepper(Stepper):
+    #Least torque, most efficient.  
+    #Commonly referred to as wave drive or single step.
+    single_mode = [[1, 0, 0, 0],
+                   [0, 1, 0, 0],
+                   [0, 0, 1, 0],
+                   [0, 0, 0, 1]]
+    #Most torque, least efficient.  
+    #Commonly referred to as full step
+    double_mode = [[1, 0, 1, 0],
+                   [0, 1, 1, 0],
+                   [0, 1, 0, 1],
+                   [1, 0, 0, 1]]
+    #Good blend of strength and efficiency. Doubles step resolution, therefore increasing accuracy.
+    #If you had a 1.8 deg stepper at 200 steps per revolution and you choose half
+    #step mode, then you have 0.9 deg stepper at 400 steps per revolution.
+    half_mode = [[1, 0, 0, 0],
+                 [1, 0, 1, 0],
+                 [0, 0, 1, 0],
+                 [0, 1, 1, 0],
+                 [0, 1, 0, 0],
+                 [0, 1, 0, 1],
+                 [0, 0, 0, 1],
+                 [1, 0, 0, 1]]
+
+    mode = single_mode
+
+    def setMode(self, mode):
+        if(mode == "double" or mode == "full"):
+            self.mode = self.double_mode
+        elif(mode == "half"):
+            self.mode = self.half_mode
+        else:
+            self.mode = self.single_mode
+
+    def forward(self, delay, steps):
+        seq_len = len(self.mode)
+        for index in range(steps):
+            if(index > 0): time.sleep(delay)
+            self.setStep(*self.mode[index % seq_len])
+
+
+    def backward(self, delay, steps):
+        seq_len = len(self.mode)
+        for index in range(steps):
+            if(index > 0): time.sleep(delay)
+            self.setStep(*reversed(self.mode[index % seq_len]))
 
 
 class Sensor:
