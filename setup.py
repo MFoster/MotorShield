@@ -4,9 +4,9 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="SBCD Motor Shield", # Replace with your own username
+    name="SBC Motor Shield", # Replace with your own username
     version="0.0.1",
-    author="",
+    author="SBC Shop",
     author_email="",
     description="Runs motors through the motor shield for Raspberry Pi",
     long_description=long_description,
